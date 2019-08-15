@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script>
+	   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+      <script src="https://d3js.org/d3-geo-projection.v1.min.js" type="text/JavaScript"></script>
+	  <style>.btnColor{background-color:#99d8c9; margin-bottom: 30px;}
+		  h1{color: #42c2f4;}</style>
+  </head>
+  <body>
+	  <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="index.html">World Data</a></li>
+      <li><a href="immigation.html">Immigration</a></li>
+		<li><a href="topEductaion.html">Ranking</a></li>
+    </ul>
+  </div>
+</nav>
+  
+<div class="container">
+	<h1>Top 10 Countries of world 2018</h1>
+	<p>The rankings are part of an analysis project called the 2018 Best Countries Report, conducted now for three years by the Wharton School of the University of Pennsylvania and global consumer insights firm Y&R’s BAV Group.</p>
+	<p>For the second consecutive year, Switzerland is the world’s best country, according to the U.S. News & World Report.</p>
+
+<p>In order to help people understand how nations are perceived on a global scale, over 21,000 respondents were asked to evaluate 80 countries by ranking them according to 65 attributes. Among those were economic influence, power, citizenship and quality of life, which collectively helped determine each country’s success as a modern nation.</p>
+      <div id="viz">
+      <svg style="width:600px;height:500px;" ></svg>
+         
+      <script>
+          var worldhealth=[];
+          var worldeducation=[];
+          var worldcrimeRate = [];
+          
+          var PromiseWrapper = (xhr, d) => new Promise(resolve => xhr(d, (p) =>resolve(p)));
+          Promise
+            .all([
+              PromiseWrapper(d3.json, "world.geojson"),
+              PromiseWrapper(d3.csv, "mydata.csv")
+          ])
+          .then(resolve =>{
+              createMap(resolve[0], resolve[1]);
+          });
+          
+          function createMap(countries, world){
+              world.forEach(world =>{
+                 worldhealth.push(world.health);
+                  worldeducation.push(world.Education);
+                  worldcrimeRate.push(world.CrimeRate);
+                  
+              })
+              
+             var aProjection = d3.geoRobinson()
+             .scale(100)
+             .translate([250,250]);
+              
+              var geopath = d3.geoPath().projection(aProjection);
+              
+              d3.select("svg")
+                .selectAll("path")
+                .data(countries.features)
+                .enter()
+                .append("path")
+                .attr("d", geopath)
+                .attr("class","countries")
+			    .style("fill","#99d8c9")
+			  .style("stroke","white")
+			  .style("stroke-width",".5px");
+              
+              }
+         
+               function health(){
+                  d3.selectAll("path.countries")
+                   .style("fill","#99d8c9")
+				   .style("stroke","none");
+                   d3.selectAll("path.countries")
+                   .filter(d => worldhealth.includes(d.properties.name))   
+                    .style("fill","#ff3457");
+              }
+            
+          function education(){
+                  d3.selectAll("path.countries")
+                   .style("fill","#99d8c9")
+				   .style("stroke","none");
+                   d3.selectAll("path.countries")
+                   .filter(d => worldeducation.includes(d.properties.name))   
+                    .style("fill","#009957");
+              }
+            function lowCrime(){
+                  d3.selectAll("path.countries")
+                   .style("fill","#99d8c9")
+				   .style("stroke","none");
+                   d3.selectAll("path.countries")
+                   .filter(d => worldcrimeRate.includes(d.properties.name))   
+                    .style("fill","#ff00aa");
+              }
+                
+      </script>
+      </div>
+	 <button class="btnColor" type="healthButton"  onclick="health()">Top in health</button>
+          <button class="btnColor" type="educationButton"  onclick="education()">Top in Education</button>
+          <button  class="btnColor" type="lowCrimeButton"  onclick="lowCrime()">Top in low crime</button>
+	  </div>
+    </body>
+</html>

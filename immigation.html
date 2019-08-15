@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script>
+	   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+      <script src="https://d3js.org/d3-geo-projection.v1.min.js" type="text/JavaScript"></script>
+		<style>
+    path.domain {
+      stroke: none;
+    }
+			h1{color: #92c463;}
+			
+			.a1{background-color:#fe9a22;width: 70px;color:white}
+			.a2{background-color:#5eaec5;width: 70px;color:white }
+			.a3{background-color:#92c463;width: 70px;color:white }
+  </style>
+  </head>
+  <body>
+	  <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="index.html">World Data</a></li>
+      <li><a href="immigation.html">Immigration</a></li>
+		<li><a href="topEductaion.html">Ranking</a></li>
+    </ul>
+  </div>
+</nav>
+  
+<div class="container">
+	<h1>Immigration trend towards top 3 Countries</h1>
+	<p>Immigration rate has been increased towarrds Canada, America and Australia over last 10 years. And Canada has became the top most priorty among the tourister and immigrants.</p>
+	<p class="a1">Canada</p>
+	<p class="a2">America</p>
+	<p class="a3">Australia</p>
+	 <div id="viz">
+      <svg style="width:600px;height:500px;" ></svg>
+    
+	 </div>
+    <script>
+      d3.csv("mydata.csv", lineChart);
+      
+      function lineChart(data) {
+        
+        xScale = d3.scaleLinear().domain([2009,2018]).range([20,480]);
+        yScale = d3.scaleLinear().domain([0,35]).range([480,20]);
+        
+        xAxis = d3.axisBottom()
+          .scale(xScale)
+          .tickSize(480)
+          .tickValues([1,2,3,4,5,6,7,8,9,10]);
+        
+        d3.select("svg").append("g").attr("id", "xAxisG").call(xAxis);
+        
+        yAxis = d3.axisRight()
+          .scale(yScale)
+          .ticks(10)
+          .tickSize(480);
+        
+        d3.select("svg").append("g").attr("id", "yAxisG").call(yAxis);
+        
+        d3.select("svg").selectAll("circle.canada")
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("class", "canada")
+            .attr("r", 5)
+            .attr("cx", d => xScale(d.year))
+            .attr("cy", d => yScale(d.canada))
+            .style("fill", "#fe9a22");
+        
+        d3.select("svg").selectAll("circle.America")
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("class", "America")
+            .attr("r", 5)
+            .attr("cx", d => xScale(d.year))
+            .attr("cy", d => yScale(d.America))
+            .style("fill", "#5eaec5");
+        
+        d3.select("svg").selectAll("circle.Australia")
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("class", "Australia")
+            .attr("r", 5)
+            .attr("cx", d => xScale(d.year))
+            .attr("cy", d => yScale(d.Australia))
+            .style("fill", "#92c463");
+        
+        var canadaLine = d3.line()
+          .x(d => xScale(d.year))
+          .y(d => yScale(d.canada));
+        
+        var americaLine = d3.line()
+          .x(d => xScale(d.year))
+          .y(d => yScale(d.America));
+        
+        var australiaLine = d3.line()
+          .x(d => xScale(d.year))
+          .y(d => yScale(d.Australia));
+        
+        d3.select("svg")
+          .append("path")
+            .attr("d", canadaLine(data))
+            .attr("fill", "none")
+            .attr("stroke", "#fe9a22")
+            .attr("stroke-width", 2)
+		  .html("text","Canada");
+        
+        d3.select("svg")
+          .append("path")
+            .attr("d", americaLine(data))
+            .attr("fill", "none")
+            .attr("stroke", "#5eaec5")
+            .attr("stroke-width", 2);
+        
+        d3.select("svg")
+          .append("path")
+            .attr("d", australiaLine(data))
+            .attr("fill", "none")
+            .attr("stroke", "#92c463")
+            .attr("stroke-width", 2);
+      }
+    </script>
+	  </div>
+	  
+  </body>
+</html>
